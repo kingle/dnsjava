@@ -9,17 +9,13 @@ import java.io.*;
  *
  * @author Brian Wellington
  */
-
 public class TextParseException extends IOException {
 
-public
-TextParseException() {
-	super();
-}
+  public TextParseException() {
+    super();
+  }
 
-public
-TextParseException(String s) {
-	super(s);
-}
-
+  public TextParseException(String s) {
+    super(s);
+  }
 }
