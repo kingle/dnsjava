@@ -30,7 +30,6 @@ import java.util.*;
  * @author <a href="mailto:yannick@meudal.net">Yannick Meudal</a>
  * @author <a href="mailto:arnt@gulbrandsen.priv.no">Arnt Gulbrandsen</a>
  */
-
 public class ResolverConfig {
 
 private String [] servers = null;
@@ -384,7 +383,7 @@ findWin(InputStream in) {
 /**
  * Calls winipcfg and parses the result to find servers and a search path.
  */
-private void
+boolean
 find95() {
 	String s = "winipcfg.out";
 	try {
@@ -396,13 +395,15 @@ find95() {
 		new File(s).delete();
 	}
 	catch (Exception e) {
+		return false;
 	}
+	return true;
 }
 
 /**
  * Calls ipconfig and parses the result to find servers and a search path.
  */
-private void
+boolean
 findNT() {
 	try {
 		Process p;
@@ -411,7 +412,9 @@ findNT() {
 		p.destroy();
 	}
 	catch (Exception e) {
+		return false;
 	}
+	return true;
 }
 
 /**
