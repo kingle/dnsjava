@@ -279,7 +279,7 @@ findNetware() {
 /**
  * Parses the output of winipcfg or ipconfig.
  */
-private void
+private boolean
 findWin(InputStream in, Locale locale) {
 	String packageName = ResolverConfig.class.getPackage().getName();
 	String resPackageName = packageName + ".windows.DNSServer";
@@ -356,28 +356,32 @@ findWin(InputStream in, Locale locale) {
 		}
 		
 		configureFromLists(lserver, lsearch);
+		return (!lserver.isEmpty() && !lsearch.isEmpty());
 	}
 	catch (IOException e) {
+		return false;
 	}
 }
 
-private void
+private boolean
 findWin(InputStream in) {
+	boolean found;
 	String property = "org.xbill.DNS.windows.parse.buffer";
 	final int defaultBufSize = 8 * 1024;
 	int bufSize = Integer.getInteger(property, defaultBufSize);
 	BufferedInputStream b = new BufferedInputStream(in, bufSize);
 	b.mark(bufSize);
-	findWin(b, null);
+	found = findWin(b, null);
 	if (servers == null) {
 		try {
 			b.reset();
 		} 
 		catch (IOException e) {
-			return;
+			return false;
 		}
-		findWin(b, new Locale("", ""));
+		found = findWin(b, new Locale("", ""));
 	}
+	return found;
 }
 
 /**
@@ -405,16 +409,17 @@ find95() {
  */
 boolean
 findNT() {
+	boolean found;
 	try {
 		Process p;
 		p = Runtime.getRuntime().exec("ipconfig /all");
-		findWin(p.getInputStream());
+		found = findWin(p.getInputStream());
 		p.destroy();
 	}
 	catch (Exception e) {
 		return false;
 	}
-	return true;
+	return found;
 }
 
 /**
