@@ -1,16 +1,24 @@
 package org.xbill.DNS;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 class ResolverConfigTest {
+
+	@AfterEach
+	void tearDown() {
+		ResolverConfig.refresh();
+	}
 
 	@Test
 	void findProperty_Success() {
@@ -38,7 +46,6 @@ class ResolverConfigTest {
 		} finally {
 			System.clearProperty(ResolverConfig.DNS_SERVER_PROP);
 			System.clearProperty(ResolverConfig.DNS_SEARCH_PROP);
-			ResolverConfig.refresh();
 		}
 	}
 
@@ -58,6 +65,15 @@ class ResolverConfigTest {
 	@EnabledOnOs({OS.LINUX, OS.MAC, OS.AIX, OS.SOLARIS})
 	void findUnix() {
 		assertTrue(ResolverConfig.getCurrentConfig().findUnix());
+	}
+
+	@Test
+	void resolvConfLoaded() throws URISyntaxException {
+		assertTrue(ResolverConfig.getCurrentConfig()
+			.findResolvConf(Paths.get(getClass()
+				.getResource("/test_loaded_resolv.conf")
+				.toURI()).toString()));
+		assertEquals(5, ResolverConfig.getCurrentConfig().ndots());
 	}
 
 	@Test
